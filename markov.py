@@ -32,9 +32,10 @@ def make_text(markov_chain_dict):
 
     key_tuple = random.choice(markov_chain_dict.keys())
     random_output_text = key_tuple[0] + ' ' + key_tuple[1]
+    end_punctuation = ['.','!','?']
 
-    while key_tuple in markov_chain_dict:
-
+    #while key_tuple in markov_chain_dict:
+    while random_output_text[-1] not in end_punctuation:
         next_in_chain = random.choice(markov_chain_dict[key_tuple])
         random_output_text = random_output_text + " " + next_in_chain
         key_tuple = (key_tuple[1], next_in_chain,)
