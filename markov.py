@@ -2,10 +2,11 @@
 
 from sys import argv
 import random
-# import twitter
-# api = twitter.api()
+import os
+import twitter 
+api = twitter.Api()
 
-script, filename = argv
+script, filename, filename2 = argv
 
 
 def make_chains(corpus,n):
@@ -15,67 +16,48 @@ def make_chains(corpus,n):
     text = corpus.read()
     text = text.strip().split()
 
-    #iterating through the file, if the key is already in the dictionary we
-    #will add the new value into the key list, if the key is not in the
-    #dictionary, we will add the key value pair
-
-#this totally worked:
-
-  # for i in range(len(text)-2):
-
-  #       if (text[i], text[i+1],) in markov_chain_dict:
-  #           markov_chain_dict[(text[i], text[i+1],)] += [text[i+2]]
-  #       else:
-  #           markov_chain_dict[(text[i],text[i+1],)] = [text[i+2]]
-
-  #       #markov_chain_dict[(text[i], text[i+1],)] = markov_chain_dict.get((text[i], text[i+1],), []).append([text[i+2]])
-  #   return markov_chain_dict
-
     
     for i in range(len(text)-n):
         key_list = []
         for j in range(n):
             key_list.append(text[i+j])
         key_tuple = tuple(key_list)
-
         if key_tuple in markov_chain_dict:
             markov_chain_dict[key_tuple] += [text[i+n]]
         else:
             markov_chain_dict[key_tuple] = [text[i+n]]
         
-        #markov_chain_dict[(text[i], text[i+1],)] = markov_chain_dict.get((text[i], text[i+1],), []).append([text[i+2]])
-
-    if len(key_tuple) < n:
+    if len(key_tuple) != n:
         del markov_chain_dict[key_tuple]
-
     return markov_chain_dict
 
-def make_text(markov_chain_dict, n):
+def make_text(markov_chain_dict, n, random_text1 = None):
     """Takes a dictionary of markov chains and returns random text
     based off an original text."""
-#this works, trying with ngram now
-    # key_tuple = random.choice(markov_chain_dict.keys())
-    # random_output_text = key_tuple[0] + ' ' + key_tuple[1]
-    # end_punctuation = ['.','!','?']
 
-    # #while key_tuple in markov_chain_dict:
-    # while random_output_text[-1] not in end_punctuation:
-    #     next_in_chain = random.choice(markov_chain_dict[key_tuple])
-    #     random_output_text = random_output_text + " " + next_in_chain
-    #     key_tuple = (key_tuple[1], next_in_chain,)
+    if random_text1 == None:
+        random_output_text = ""
+        key_tuple = random.choice(markov_chain_dict.keys())
+    else:
+        random_output_text = random_text1
+        last_word = random_text1.split()[-1]
+        mc_keys = markov_chain_dict.keys()
+        for a_key in mc_keys:
+            if last_word == a_key[0]:
+                key_tuple = a_key
+            else:
+                key_tuple = random.choice(markov_chain_dict.keys())
 
-
-    random_output_text = ""
-    key_tuple = random.choice(markov_chain_dict.keys())
-    key_list = list(key_tuple)
+    key_list = list(key_tuple)    
     for index in range(len(key_list)):
         random_output_text = random_output_text + " " + key_list[index]
-    end_punctuation = ['.','!','?']
 
-    while key_tuple in markov_chain_dict:
+    # while key_tuple in markov_chain_dict:
     # while random_output_text[-1] not in end_punctuation:
+    for times in range(100):
         if len(key_tuple) == n:
              next_in_chain = random.choice(markov_chain_dict[key_tuple])
+    #         print("next_in_chain",next_in_chain)
              random_output_text = random_output_text + " " + next_in_chain
 
              fake_tuple = list(key_tuple)
@@ -83,37 +65,68 @@ def make_text(markov_chain_dict, n):
              fake_tuple.append(next_in_chain)
              key_tuple = tuple(fake_tuple)
 
-    if end_punctuation[0] in random_output_text or end_punctuation[1] in random_output_text or end_punctuation[2] in random_output_text:
-        twitter_output = ''
-        for achar in random_output_text:
-            if len(twitter_output) > 140:
-                break
-            elif achar not in end_punctuation:
-                twitter_output += achar
-            else:
-                twitter_output +=achar
-                break
-    if twitter_output:
-        return twitter_output
-    else:
-        return random_output_text[0:139]
+    #end_punctuation = ['.','!','?']
+
+
+    # if end_punctuation[0] in random_output_text or end_punctuation[1] in random_output_text or end_punctuation[2] in random_output_text:
+    #     twitter_output = ''
+    #     for achar in random_output_text:
+    #         if len(twitter_output) > 140:
+    #             break
+    #         elif achar not in end_punctuation:
+    #             twitter_output += achar
+    #         else:
+    #             twitter_output +=achar
+    #             break
+    # if twitter_output:
+    #     return twitter_output
+
+
+    # else:
+    return random_output_text #[0:139]
+
+
+def twitter_it(random_text1, random_text2):
+    CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
+    CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
+    ACCESS_TOKEN_KEY = os.environ.get('ACCESS_TOKEN_KEY')
+    ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
+    api = twitter.Api(consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET, access_token_key=ACCESS_TOKEN_KEY, access_token_secret=ACCESS_TOKEN_SECRET)
+    
+    tweet = random_text2[len(random_text1)-70:len(random_text1)+70]
+
+
+    for achar in tweet:
+         if achar == " ":
+             first_space = tweet.index(achar)
+             break
+    for index in range(len(tweet)):
+         if tweet[-1*index] == " ":
+             last_space = index
+
+    real_tweet = tweet[first_space+1:last_space]
+    print "tweet: "
+    print tweet
+    print "real tweet: first space, last_space"
+    print real_tweet, first_space, last_space
+
+    api.PostUpdate(real_tweet)
 
 def main():
 
-    n = 6
+    n = 5
+    #markov_chain_dict = {}
 
     input_text = open(filename)
+    input_text2 = open(filename2)
 
-    chain_dict = make_chains(input_text,n)
-
-    random_text = make_text(chain_dict,n)
-    print random_text
-
-    # api = twitter.api(consumer_key='rKDZ8Ufjo9vLCZyGB56TnfzQj',consumer_secret='nSdINaV99BEkSlK10Lun3OQaQhJYVWzWuxkKQvrPtGNLsLgwP9', access_token_key='2845484612-vFQKHeUKEV24Bk2uawBhddu6z6vWrvrE6RRU2R9', access_token_secret='f2wCSxnl0Np7dy0UHTFKza9l5zXEqJP4wBhLHd6eGtKMl')
+    chain_dict1 = make_chains(input_text,n)
+    chain_dict2 = make_chains(input_text2,n)
 
 
-    # api.PostUpdate(random_text)
-    
+    random_text1 = make_text(chain_dict1,n)
+    random_text2 = make_text(chain_dict2,n, random_text1)
+    twitter_it(random_text1,random_text2)
 
 if __name__ == "__main__":
     main()
