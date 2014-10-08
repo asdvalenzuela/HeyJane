@@ -2,8 +2,8 @@
 
 from sys import argv
 import random
-import twitter
-api = twitter.api()
+# import twitter
+# api = twitter.api()
 
 script, filename = argv
 
@@ -109,10 +109,10 @@ def main():
     random_text = make_text(chain_dict,n)
     print random_text
 
-    api = twitter.api(consumer_key='rKDZ8Ufjo9vLCZyGB56TnfzQj',consumer_secret='nSdINaV99BEkSlK10Lun3OQaQhJYVWzWuxkKQvrPtGNLsLgwP9', access_token_key='2845484612-vFQKHeUKEV24Bk2uawBhddu6z6vWrvrE6RRU2R9', access_token_secret='f2wCSxnl0Np7dy0UHTFKza9l5zXEqJP4wBhLHd6eGtKMl')
+    # api = twitter.api(consumer_key='rKDZ8Ufjo9vLCZyGB56TnfzQj',consumer_secret='nSdINaV99BEkSlK10Lun3OQaQhJYVWzWuxkKQvrPtGNLsLgwP9', access_token_key='2845484612-vFQKHeUKEV24Bk2uawBhddu6z6vWrvrE6RRU2R9', access_token_secret='f2wCSxnl0Np7dy0UHTFKza9l5zXEqJP4wBhLHd6eGtKMl')
 
 
-    api.PostUpdate(random_text)
+    # api.PostUpdate(random_text)
     
 
 if __name__ == "__main__":
